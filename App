@@ -1,0 +1,88 @@
+import SwiftUI
+import PlaygroundSupport
+
+struct ContentView: View {
+    @State private var inputText = ""
+    @State private var translatedText = ""
+    @State private var isTextToMorse = true
+    
+    
+    let morseDict: [Character: String] = [
+        "A": ".-",    "B": "-...",  "C": "-.-.", "D": "-..",  "E": ".",
+        "F": "..-.",  "G": "--.",   "H": "....", "I": "..",   "J": ".---",
+        "K": "-.-",   "L": ".-..",  "M": "--",   "N": "-.",   "O": "---",
+        "P": ".--.",  "Q": "--.-",  "R": ".-.",  "S": "...",  "T": "-",
+        "U": "..-",   "V": "...-",  "W": ".--",  "X": "-..-", "Y": "-.--",
+        "Z": "--..",  " ": "/"
+    ]
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Morse Code Translator")
+                .font(.title)
+                .bold()
+            
+            Picker("Direction", selection: $isTextToMorse) {
+                Text("Text to Morse").tag(true)
+                Text("Morse to Text").tag(false)
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .padding(.horizontal)
+            
+            TextField("Enter text or morse code", text: $inputText)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(.horizontal)
+            
+            Button("Translate") {
+                if isTextToMorse {
+                    translatedText = textToMorse(inputText)
+                } else {
+                    translatedText = morseToText(inputText)
+                }
+            }
+            .padding()
+            .background(Color.pink)
+            .foregroundColor(.white)
+            .cornerRadius(8)
+            
+            Text("Translation:")
+                .font(.headline)
+            
+            Text(translatedText)
+                .font(.body)
+                .multilineTextAlignment(.center)
+                .padding()
+        }
+        .padding()
+    }
+        
+    func textToMorse(_ text: String) -> String {
+        let upperText = text.uppercased()
+        var result = ""
+        for char in upperText {
+            if let morse = morseDict[char] {
+                result += morse + " "
+            } else {
+                result += "? "
+            }
+        }
+        return result.trimmingCharacters(in: .whitespaces)
+    }
+    
+      
+    func morseToText(_ morse: String) -> String {
+        let reversedDict = Dictionary(uniqueKeysWithValues: morseDict.map { ($1, $0) })
+        let symbols = morse.components(separatedBy: " ")
+        var result = ""
+        for symbol in symbols {
+            if let char = reversedDict[symbol] {
+                result.append(char)
+            } else {
+                result.append("?")
+            }
+        }
+        return result
+    }
+}
+
+PlaygroundPage.current.setLiveView(ContentView())
